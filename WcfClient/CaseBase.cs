@@ -6,14 +6,27 @@ namespace WcfClient
     internal abstract class CaseBase
     {
         protected int Port { get; }
-        protected SecurityMode Mode { get; }
         protected TransferMode TransferMode { get; }
 
-        protected CaseBase(int port, SecurityMode securityMode, TransferMode transferMode)
+        protected CaseBase(int port, TransferMode transferMode)
         {
             Port = port;
-            Mode = securityMode;
             TransferMode = transferMode;
+        }
+
+        public override string ToString()
+        {
+            return $"port: {Port, 4}, transferMode: {TransferMode,20}";
+        }
+    }
+
+    internal abstract class CaseBase<TSecMode> : CaseBase
+    {
+        protected TSecMode Mode { get; }
+
+        protected CaseBase(int port, TSecMode securityMode, TransferMode transferMode) : base(port, transferMode)
+        {
+            Mode = securityMode;
         }
 
         public override string ToString()
@@ -22,12 +35,12 @@ namespace WcfClient
         }
     }
 
-    internal abstract class CaseBase<T>: CaseBase where T: class
+    internal abstract class CaseBase<T, TSecMode> : CaseBase<TSecMode> where T: class
     {
-        private readonly Func<SecurityMode, TransferMode, ChannelFactory<T>> _factoryFunc;
+        private readonly Func<TSecMode, TransferMode, ChannelFactory<T>> _factoryFunc;
         private readonly Func<ChannelFactory<T>, int, T> _channelFunc;
 
-        protected CaseBase(int port, SecurityMode securityMode, TransferMode transferMode, Func<SecurityMode, TransferMode, ChannelFactory<T>> factoryFunc, Func<ChannelFactory<T>, int, T> channelFunc) 
+        protected CaseBase(int port, TSecMode securityMode, TransferMode transferMode, Func<TSecMode, TransferMode, ChannelFactory<T>> factoryFunc, Func<ChannelFactory<T>, int, T> channelFunc) 
             : base(port, securityMode, transferMode)
         {
             _factoryFunc = factoryFunc;

@@ -13,9 +13,24 @@ namespace WcfServer
             host1.AddServiceEndpoint(typeof(IDownload1), new NetTcpBinding(SecurityMode.None), new Uri("net.tcp://localhost:6666"));
             host1.AddServiceEndpoint(typeof(IDownload1), new NetTcpBinding(SecurityMode.Transport), new Uri("net.tcp://localhost:6667"));
             host1.AddServiceEndpoint(typeof(IDownload1), new NetTcpBinding(SecurityMode.Message), new Uri("net.tcp://localhost:6668"));
+
             host1.AddServiceEndpoint(typeof(IDownload1), new NetTcpBinding(SecurityMode.None) { TransferMode = TransferMode.StreamedResponse }, new Uri("net.tcp://localhost:6669"));
             host1.AddServiceEndpoint(typeof(IDownload1), new NetTcpBinding(SecurityMode.Transport) { TransferMode = TransferMode.StreamedResponse }, new Uri("net.tcp://localhost:6670"));
+
             host1.AddServiceEndpoint(typeof(IDownload1), new NetHttpBinding(BasicHttpSecurityMode.None, false), new Uri("http://localhost:6766"));
+
+            host1.AddServiceEndpoint(typeof(IDownload1), new BasicHttpBinding(BasicHttpSecurityMode.TransportCredentialOnly), new Uri("http://localhost:6866"));
+            host1.AddServiceEndpoint(typeof(IDownload1), new BasicHttpsBinding
+            {
+                Security = new BasicHttpsSecurity
+                {
+                    Mode = BasicHttpsSecurityMode.Transport,
+                    Transport = new HttpTransportSecurity
+                    {
+                        ClientCredentialType = HttpClientCredentialType.Windows,
+                    }
+                },
+            }, new Uri("https://localhost:7866"));
 
             host1.Open();
             Console.WriteLine("Host for " + host1.SingletonInstance.GetType().Name + " is open");
